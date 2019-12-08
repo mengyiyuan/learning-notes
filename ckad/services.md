@@ -17,3 +17,10 @@ To list out service mapping to pods, run:
 - LoadBalancer: Only works if your cluster is set up to work with a cloud provider. Service is exposed through a load balancer created on the cloud platform.
 - ExternalName: maps service to an **external** address. Used to allow resources within the cluster to access things outside the cluster through a service. This only sets up a DNS mapping, does not proxy traffic.
 
+- port: service port in the cluster
+- targetPort: pod port mapped to from the service port
+- nodePort: port exposed on each node for the service
+
+`kubectl get svc -o wide` to get cluster IP.
+
+A service can be accessed at `<Cluster IP>:<port>` or `localhost:<nodePort>` from a node.
