@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: counter
+spec:
+  containers:
+  - name: count
+    image: busybox
+    args:
+    - /bin/sh
+    - -c
+    - >
+      i=0;
+      while true;
+      do
+        echo "$i: $(date)" >> /var/log/1.log;
+        echo "$(date) INFO $i" >> /var/log/2.log;
+        i=$((i+1));
+        sleep 1;
+      done
+    volumeMounts:
+    - name: temp-volume
+      mountPath: /var/log
+  - name: adapter
+    image: k8s.gcr.io/fluentd-gcp:1.30
+    env:
+    - name: FLUENTD_ARGS
+      value: '-c /fluentd/etc/fluent.conf'
+    volumeMounts:
+    - name: config-volume
+      mountPath: /fluentd/etc
+    - name: temp-volume
+      mountPath: /var/log
+    - name: log-volume
+      mountPath: /var/logout
+  volumes:
+  - name: config-volume
+    configMap:
+      name: fluentd-config
+  - name: temp-volume
+    emptyDir: {}
+  - name: log-volume
+    hostPath:
+      path: /usr/ckad/log_output
